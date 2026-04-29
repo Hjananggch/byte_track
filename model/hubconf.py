@@ -13,6 +13,13 @@ Usage:
 import torch
 
 
+def _torch_load_checkpoint(file, map_location=None):
+    try:
+        return torch.load(file, map_location=map_location, weights_only=False)
+    except TypeError:
+        return torch.load(file, map_location=map_location)
+
+
 def _create(name, pretrained=True, channels=3, classes=80, autoshape=True, verbose=True, device=None):
     """
     Creates or loads a YOLOv5 model.
@@ -63,11 +70,13 @@ def _create(name, pretrained=True, channels=3, classes=80, autoshape=True, verbo
                         model = AutoShape(model)  # for file/URI/PIL/cv2/np inputs and NMS
             except Exception:
                 model = attempt_load(path, device=device, fuse=False)  # arbitrary model
+                if autoshape:
+                    model = AutoShape(model)  # for file/URI/PIL/cv2/np inputs and NMS
         else:
             cfg = list((Path(__file__).parent / "models").rglob(f"{path.stem}.yaml"))[0]  # model.yaml path
             model = DetectionModel(cfg, channels, classes)  # create model
             if pretrained:
-                ckpt = torch.load(attempt_download(path), map_location=device)  # load
+                ckpt = _torch_load_checkpoint(attempt_download(path), map_location=device)  # load
                 csd = ckpt["model"].float().state_dict()  # checkpoint state_dict as FP32
                 csd = intersect_dicts(csd, model.state_dict(), exclude=["anchors"])  # intersect
                 model.load_state_dict(csd, strict=False)  # load

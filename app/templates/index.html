@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>图像识别</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="hero__badge">图片识别</div>
+        <h1 class="hero__title">拍照或选图识别</h1>
+        <p class="hero__subtitle">支持手机拍摄、图库选择和桌面上传，只返回识别结果，不展示服务器路径和模型配置。</p>
+      </section>
+
+      <section class="layout">
+        <section class="panel panel--form">
+          <h2 class="section-title">选择图片</h2>
+          <p class="section-copy">手机端可直接拍照，也可以从图库选择图片。选中图片后会自动开始识别。</p>
+
+          <div class="upload-actions">
+            <label class="upload-button upload-button--accent">
+              <strong>手机拍照</strong>
+              <span>优先调起后置摄像头。</span>
+              <input id="cameraInput" class="upload-input" type="file" accept="image/*" capture="environment">
+            </label>
+            <label class="upload-button">
+              <strong>从图库选择</strong>
+              <span>选择相册或本地图片。</span>
+              <input id="galleryInput" class="upload-input" type="file" accept="image/*">
+            </label>
+          </div>
+
+          <div class="controls">
+            <div class="control-grid">
+              <div class="field">
+                <label for="confRange">置信度阈值 <span id="confValue">0.25</span></label>
+                <input id="confRange" type="range" min="0.05" max="0.95" step="0.01" value="0.25">
+                <small>越高越严格，误检更少，漏检可能增加。</small>
+              </div>
+              <div class="field">
+                <label for="iouRange">IOU 阈值 <span id="iouValue">0.45</span></label>
+                <input id="iouRange" type="range" min="0.05" max="0.95" step="0.01" value="0.45">
+                <small>控制重叠框合并强度，通常保持默认即可。</small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel--result">
+          <div>
+            <h2 class="section-title">识别结果</h2>
+            <p class="section-copy">识别后的图片和目标列表会显示在这里。</p>
+          </div>
+
+          <div id="messageBox" class="message"></div>
+
+          <div id="resultStage" class="result-stage">
+            <div id="previewPlaceholder" class="result-placeholder">
+              还没有图片。<br>
+              请拍照或从图库选择图片。
+            </div>
+            <img id="previewImage" alt="识别结果预览" hidden>
+          </div>
+
+          <div id="resultMeta" class="result-meta"></div>
+          <div id="resultList" class="result-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
